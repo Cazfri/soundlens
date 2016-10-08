@@ -20,7 +20,7 @@ import requests
 #d1075499bec940ad9d0d2aa09a6509bd - client_id
 #c8ae02f219604c0fa9e074ad1a7d5494 - secret
 
-def spot(request):
+#def spot(request):
 
 
 def home(request):
