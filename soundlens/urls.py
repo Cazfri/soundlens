@@ -19,5 +19,5 @@ from . import views
 
 urlpatterns = [
     #url(r'^admin/', admin.site.urls),
-    url(r'^index/', views.current_datetime, name='current_datetime')
+    url(r'^$', views.home, name='home')
 ]
