@@ -1,6 +1,9 @@
 from django.http import HttpResponse
+from django.shortcuts import redirect
 import json
 import requests
+import spotipy
+import spotipy.util as util
 
 # curl -X POST "https://api.clarifai.com/v1/token/" \
 #   -d "client_id={client_id}" \
@@ -20,10 +23,46 @@ import requests
 #d1075499bec940ad9d0d2aa09a6509bd - client_id
 #c8ae02f219604c0fa9e074ad1a7d5494 - secret
 
-#def spot(request):
+SPOTIPY_CLIENT_ID = 'd1075499bec940ad9d0d2aa09a6509bd'
+SPOTIPY_CLIENT_SECRET = 'c8ae02f219604c0fa9e074ad1a7d5494'
+SPOTIPY_REDIRECT_URI = 'http://localhost:8000/spot2'
+SCOPE = 'user-library-read'
+CACHE = '.spotipyoauthcache'
+
+sp_oauth = spotipy.oauth2.SpotifyOAuth( SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET,SPOTIPY_REDIRECT_URI,scope=SCOPE,cache_path=CACHE );
+
+def spotGetOAuth(request):
+    return HttpResponse("HI");
 
 
-def home(request):
+def getKeys(request):
+    print(sp_oauth);
+    access_token = ""
+
+    token_info = sp_oauth.get_cached_token()
+
+    if token_info:
+        print("Found cached token!")
+        access_token = token_info['access_token']
+    else:
+        url = request.get_full_path();
+        code = sp_oauth.parse_response_code(url)
+        if code:
+            print("Found Spotify auth code in Request URL! Trying to get valid access token...");
+            token_info = sp_oauth.get_access_token(code)
+            access_token = token_info['access_token']
+        else:
+            print('You fucked it')
+
+    if access_token:
+        print("Access token available! Trying to get user information...")
+        sp = spotipy.Spotify(access_token)
+        results = sp.current_user()
+        print(results);
+        return HttpResponse(results);
+    return HttpResponse("<a href='" + sp_oauth.get_authorize_url() + "'>Login to Spotify</a>");
+
+def submitImg(request):
     # rq = requests.post("https://api.clarifai.com/v1/token/", data = {'client_id':'dO_TE1MlMpCBeR9SYDL3KVKldKnRfBzlqGU4yGwT',
     #                                                                 'client_secret':'2DpZgu07HXcMeTWnFRDOLgVd2kVyzNmcWiDNx7Kj',
     #                                                                 'grant_type':'client_credentials'});
