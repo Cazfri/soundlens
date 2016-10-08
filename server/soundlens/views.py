@@ -63,18 +63,21 @@ def getKeys(request):
     return HttpResponse("<a href='" + sp_oauth.get_authorize_url() + "'>Login to Spotify</a>");
 
 def submitImg(request):
-    # rq = requests.post("https://api.clarifai.com/v1/token/", data = {'client_id':'dO_TE1MlMpCBeR9SYDL3KVKldKnRfBzlqGU4yGwT',
-    #                                                                 'client_secret':'2DpZgu07HXcMeTWnFRDOLgVd2kVyzNmcWiDNx7Kj',
-    #                                                                 'grant_type':'client_credentials'});
-    # #print(rq.json());
-    # accessToken = rq.json()['access_token'];
-    # #print(accessToken);
-    # rq = requests.post("https://api.clarifai.com/v1/tag/", data = {'model':'general-v1.3',
-    #                                                                 'url':'https://samples.clarifai.com/metro-north.jpg'},
-    #                                                        headers = {'Authorization':'Bearer ' + accessToken});
-    # print(rq.json());
-    # resp = rq.json();
-    resp = json.loads('{"status_code": "OK", "results": [{"result": {"tag": {"concept_ids": ["ai_HLmqFqBf", "ai_fvlBqXZR", "ai_Xxjc3MhT", "ai_6kTjGfF6", "ai_RRXLczch", "ai_VRmbGVWh", "ai_SHNDcmJ3", "ai_jlb9q33b", "ai_46lGZ4Gm", "ai_tr0MBp64", "ai_l4WckcJN", "ai_2gkfMDsM", "ai_CpFBRWzD", "ai_786Zr311", "ai_6lhccv44", "ai_971KsJkn", "ai_WBQfVV0p", "ai_dSCKh8xv", "ai_TZ3C79C6", "ai_VSVscs9k"], "classes": ["train", "railway", "transportation system", "station", "train", "travel", "tube", "commuter", "railway", "traffic", "blur", "platform", "urban", "no person", "business", "track", "city", "fast", "road", "terminal"], "probs": [0.9989112019538879, 0.9975532293319702, 0.9959157705307007, 0.9925730228424072, 0.9925559759140015, 0.9878921508789062, 0.9816359281539917, 0.9712483286857605, 0.9690325260162354, 0.9687051773071289, 0.9667078256607056, 0.9624242782592773, 0.960752010345459, 0.9586490392684937, 0.9572030305862427, 0.9494642019271851, 0.940894365310669, 0.9399334192276001, 0.9312160611152649, 0.9230834245681763]}}, "local_id": "", "status_code": "OK", "docid_str": "76961bb1ddae0e82f683c2fd17a8794e", "status_msg": "OK", "docid": 17763255747558799694, "url": "https://samples.clarifai.com/metro-north.jpg"}], "status_msg": "All images in request have completed successfully. ", "meta": {"tag": {"model": "general-v1.3", "config": "None", "timestamp": 1475939014.659398}}}')
+    imgSrc = request.GET.get('imgSrc', 'null');
+    if (imgSrc == 'null'):
+        return HttpResponse("The image source you submitted was undefined");
+    rq = requests.post("https://api.clarifai.com/v1/token/", data = {'client_id':'dO_TE1MlMpCBeR9SYDL3KVKldKnRfBzlqGU4yGwT',
+                                                                    'client_secret':'2DpZgu07HXcMeTWnFRDOLgVd2kVyzNmcWiDNx7Kj',
+                                                                    'grant_type':'client_credentials'});
+    #print(rq.json());
+    accessToken = rq.json()['access_token'];
+    #print(accessToken);
+    rq = requests.post("https://api.clarifai.com/v1/tag/", data = {'model':'general-v1.3',
+                                                                    'url':imgSrc},
+                                                           headers = {'Authorization':'Bearer ' + accessToken});
+    print(rq.json());
+    resp = rq.json();
+    #resp = json.loads('{"status_code": "OK", "results": [{"result": {"tag": {"concept_ids": ["ai_HLmqFqBf", "ai_fvlBqXZR", "ai_Xxjc3MhT", "ai_6kTjGfF6", "ai_RRXLczch", "ai_VRmbGVWh", "ai_SHNDcmJ3", "ai_jlb9q33b", "ai_46lGZ4Gm", "ai_tr0MBp64", "ai_l4WckcJN", "ai_2gkfMDsM", "ai_CpFBRWzD", "ai_786Zr311", "ai_6lhccv44", "ai_971KsJkn", "ai_WBQfVV0p", "ai_dSCKh8xv", "ai_TZ3C79C6", "ai_VSVscs9k"], "classes": ["train", "railway", "transportation system", "station", "train", "travel", "tube", "commuter", "railway", "traffic", "blur", "platform", "urban", "no person", "business", "track", "city", "fast", "road", "terminal"], "probs": [0.9989112019538879, 0.9975532293319702, 0.9959157705307007, 0.9925730228424072, 0.9925559759140015, 0.9878921508789062, 0.9816359281539917, 0.9712483286857605, 0.9690325260162354, 0.9687051773071289, 0.9667078256607056, 0.9624242782592773, 0.960752010345459, 0.9586490392684937, 0.9572030305862427, 0.9494642019271851, 0.940894365310669, 0.9399334192276001, 0.9312160611152649, 0.9230834245681763]}}, "local_id": "", "status_code": "OK", "docid_str": "76961bb1ddae0e82f683c2fd17a8794e", "status_msg": "OK", "docid": 17763255747558799694, "url": "https://samples.clarifai.com/metro-north.jpg"}], "status_msg": "All images in request have completed successfully. ", "meta": {"tag": {"model": "general-v1.3", "config": "None", "timestamp": 1475939014.659398}}}')
 
     if resp['status_code'] != 'OK': #The return value was baaaad!!
         return HttpResponse("There was an issue converting you image:<br>" + resp['status_msg'])
