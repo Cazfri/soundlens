@@ -29,7 +29,7 @@ indexHTML = '''
 <html>
 
     <head>
-        <title>Hot Dawg</title>
+        <title>SoundLens</title>
     </head>
 
     <body>
@@ -93,7 +93,7 @@ def getKeys(request, happiness, output, imgSrc):
             token_info = sp_oauth.get_access_token(code)
             access_token = token_info['access_token']
         else:
-            print('You fucked it')
+            print('You messed it')
 
     if access_token:
         print("Access token available! Trying to get user information...")
@@ -153,7 +153,7 @@ def getTweets(queries):
         scoresum += response['score']
     score = scoresum / len(req['documents'])
     score -= .55; #.55 - .85
-    score *= 1/.3 #0 - .3
+    score = score * (1/.3) #0 - .3
     if (score >= 1):
         score =.99
     elif score < 0:
