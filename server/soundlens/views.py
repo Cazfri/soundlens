@@ -39,23 +39,16 @@ indexHTML = '''
             <button type="button" onclick="previewImage()">preview image</button>
 
             <img src="#" id="preview" alt="image preview..." height="250" width="300">
-
-            <a value="upload" id="link" href="#" onclick="fixValues">upload image</a>
+            <br /> <br />
+            <a value="upload" id="link" href="#" >upload image</a>
 
             <script>
                 function previewImage() {
                     var url = document.getElementById("imgUrl").value;
                     document.getElementsByTagName("img")[0].setAttribute("src", url);
-                }
-                function fixValues() {
-                    var img = document.getElementById("imgUrl");
-                    var url = img.value();
                     var s = "/sendImg?imgSrc=" + url;
-                    var link = document.getElementById("link");
-                    link.setAttribute("href", s);
+                    document.getElementsByTagName("a")[0].setAttribute("href", s);
                 }
-
-                previewImage();
             </script>
     </body>
 
