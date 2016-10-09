@@ -42,7 +42,7 @@ indexHTML = '''
 
             <img src="#" id="preview" alt="image preview..." height="250" width="300">
             <br /> <br />
-            <a value="upload" id="link" href="#" >upload image</a>
+            <a value="upload" id="link" href="#" style="display:none;">upload image</a>
 
             <script>
                 function previewImage() {
@@ -50,6 +50,7 @@ indexHTML = '''
                     document.getElementsByTagName("img")[0].setAttribute("src", url);
                     var s = "/sendImg?imgSrc=" + url;
                     document.getElementsByTagName("a")[0].setAttribute("href", s);
+                    document.getElementById("link").setAttribute("style", "");
                 }
             </script>
     </body>
@@ -76,8 +77,7 @@ def home(request):
     return HttpResponse(indexHTML);
 
 
-def getKeys(request):
-    print(sp_oauth);
+def getKeys(request, happiness, output, imgSrc):
     access_token = ""
 
     token_info = sp_oauth.get_cached_token()
@@ -99,25 +99,23 @@ def getKeys(request):
         print("Access token available! Trying to get user information...")
         sp = spotipy.Spotify(access_token)
         genres = sp.recommendation_genre_seeds()
-        recommendations = sp.recommendations(seed_artists=[], seed_genres=[genres['genres'][1]], seed_tracks=[], limit=20, country=None)
+        print(genres);
+        print(float(happiness));
+        recommendations = sp.recommendations(seed_artists=[], seed_genres=['classical'], seed_tracks=[], limit=20, country=None, target_valence=float(happiness), target_energy=float(happiness)) #target_instrumentalness=.999
         #print(recommendations['tracks']);
         songIDs = "";
         for track in recommendations['tracks']:
             songIDs += track['id'] + ','
         songIDs = songIDs[:-1];
-        playlist = '<iframe src="https://embed.spotify.com/?uri=spotify:trackset:PREFEREDTITLE:'+ songIDs + '" frameborder="0" allowtransparency="true"></iframe>'
+        playlist = '<iframe src="https://embed.spotify.com/?uri=spotify:trackset:PREFEREDTITLE:'+ songIDs + '" frameborder="0" allowtransparency="true"></iframe><h3>The happiness value was: ' + str(happiness) + '</h3><br><h3>' + ', '.join(output) + '</h3><br><img height="300" src="' + imgSrc + '" />'
         print(songIDs);
         #results = sp.current_user()
         #print(results);
         return HttpResponse(playlist);
     return HttpResponse("<a href='" + sp_oauth.get_authorize_url() + "'>Login to Spotify</a>");
 
-def getTweets(request):
+def getTweets(queries):
     response_tweets = []
-    queries = [
-        "boat",
-        "water"
-    ]
     auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
     api = tweepy.API(auth)
 
@@ -154,7 +152,13 @@ def getTweets(request):
     for response in req['documents']:
         scoresum += response['score']
     score = scoresum / len(req['documents'])
-    return HttpResponse(score)
+    score -= .55; #.55 - .85
+    score *= 1/.3 #0 - .3
+    if (score >= 1):
+        score =.99
+    elif score < 0:
+        score = 0
+    return score;
 
 def getEmotions(request):
     tempInfo = {
@@ -206,8 +210,8 @@ def submitImg(request):
         return HttpResponse("There was an issue converting you image (it is in the results):<br>" + resp['results'][0]['status_msg'])
 
 
-    output = '<table><tr><th>Class</th><th>Probiblity</th></tr>'
+    output = [];
     for i in range(len(resp['results'][0]['result']['tag']['probs'])): #'classes'
-        output += '<tr><td>' + resp['results'][0]['result']['tag']['classes'][i] + '</td><td>' + str(resp['results'][0]['result']['tag']['probs'][i]) + '</td></tr>'
-    output += '</table>';
-    return HttpResponse(output);
+        output.append(resp['results'][0]['result']['tag']['classes'][i])
+    score = getTweets(output);
+    return getKeys(request, score, output, imgSrc);
