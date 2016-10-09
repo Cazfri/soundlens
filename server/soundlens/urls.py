@@ -22,5 +22,7 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^sendImg/', views.submitImg, name='submitImg'),
     url(r'^spot1', views.spotGetOAuth, name='spotGetOAuth'),
-    url(r'^spot2', views.getKeys, name='getKeys')
+    url(r'^spot2', views.getKeys, name='getKeys'),
+    url(r'^spot3', views.getTweets, name='getTweets'),
+    url(r'^spot4', views.getEmotions, name='getEmotions')
 ]

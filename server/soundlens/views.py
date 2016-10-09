@@ -28,6 +28,10 @@ SPOTIPY_CLIENT_SECRET = 'c8ae02f219604c0fa9e074ad1a7d5494'
 SPOTIPY_REDIRECT_URI = 'http://localhost:8000/spot2'
 SCOPE = 'user-library-read'
 CACHE = '.spotipyoauthcache'
+MS_COGNITAVE_SUBSCRIPTION = '92d2ca92b1224e83989a7e758e6f4d02'
+TWITTER_CONSUMER_KEY = ''
+TWITTER_CONSUMER_SECRET = ''
+
 
 sp_oauth = spotipy.oauth2.SpotifyOAuth( SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET,SPOTIPY_REDIRECT_URI,scope=SCOPE,cache_path=CACHE );
 
@@ -65,6 +69,42 @@ def getKeys(request):
         return HttpResponse(results);
     return HttpResponse("<a href='" + sp_oauth.get_authorize_url() + "'>Login to Spotify</a>");
 
+def getTweets(request):
+    response_tweets = []
+    queries = [
+        "boat",
+        "water"
+    ]
+    bearer_credentials = str(base64.b64encode(bytes(s, 'UTF-8')))[2:-1]
+    bearer_response = requests.post('https://api.twitter.com/oauth2/token', )
+    for query in queries:
+        tweets = []
+        # poll Twitter here
+
+def getEmotions(request):
+    tempInfo = {
+        'docs' : ["Wow I'm so excited to hear this awesome music", "This fantastic thing is going to be great"] # meh it works for the demo
+    }
+
+    headers = {
+        "Ocp-Apim-Subscription-Key": MS_COGNITAVE_SUBSCRIPTION,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    documents = []
+    i = 1
+    input_documents = tempInfo['docs']
+    for document in input_documents:
+        documents.append({
+            "language": "en",
+            "id": str(i),
+            "text": document
+        })
+        i += 1
+    print(documents)
+    req = requests.post("https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment", data={"documents" : documents}, headers=headers)
+    return HttpResponse(req)
+
 def submitImg(request):
     imgSrc = request.GET.get('imgSrc', 'null');
     if (imgSrc == 'null'):
@@ -75,6 +115,7 @@ def submitImg(request):
     #print(rq.json());
     accessToken = rq.json()['access_token'];
     #print(accessToken);
+    # Post image to Clarifai
     rq = requests.post("https://api.clarifai.com/v1/tag/", data = {'model':'general-v1.3',
                                                                     'url':imgSrc},
                                                            headers = {'Authorization':'Bearer ' + accessToken});
@@ -88,6 +129,7 @@ def submitImg(request):
     print(resp['results'][0]);
     if resp['results'][0]['status_code'] != 'OK':
         return HttpResponse("There was an issue converting you image (it is in the results):<br>" + resp['results'][0]['status_msg'])
+
 
     output = '<table><tr><th>Class</th><th>Probiblity</th></tr>'
     for i in range(len(resp['results'][0]['result']['tag']['probs'])): #'classes'
