@@ -1,0 +1,22 @@
+<head> 
+
+</head>
+
+<body>
+        <h1>soundlens</h1>
+
+        <label for="imgUrl">Enter Image URL:</label>
+        <input type="text" id="imgUrl" name="imgUrl" />
+
+        <a value="upload" id="link" href="#" onclick="fixValues" \>
+
+        <script>
+            function fixValues() {
+                var img = document.getElementById("imgUrl");
+                var url = img.value();
+                var s = "/sendImg?imgSrc=" + url;
+                var link = document.getElementById("link");
+                link.setAttribute("href", s);
+            }
+        </script>
+</body>
