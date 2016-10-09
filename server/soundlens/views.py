@@ -4,6 +4,8 @@ import json
 import requests
 import spotipy
 import spotipy.util as util
+import tweepy
+import base64
 
 # curl -X POST "https://api.clarifai.com/v1/token/" \
 #   -d "client_id={client_id}" \
@@ -29,8 +31,8 @@ SPOTIPY_REDIRECT_URI = 'http://localhost:8000/spot2'
 SCOPE = 'user-library-read'
 CACHE = '.spotipyoauthcache'
 MS_COGNITAVE_SUBSCRIPTION = '92d2ca92b1224e83989a7e758e6f4d02'
-TWITTER_CONSUMER_KEY = ''
-TWITTER_CONSUMER_SECRET = ''
+TWITTER_CONSUMER_KEY = 'vyqW3F9rXy3va4rtvKMwmGfyz'
+TWITTER_CONSUMER_SECRET = 'R3JZwKl9Lc66vxKIauTdVCgcC0NHESWtGB3wuaMYWr7PPi3xEp'
 
 
 sp_oauth = spotipy.oauth2.SpotifyOAuth( SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET,SPOTIPY_REDIRECT_URI,scope=SCOPE,cache_path=CACHE );
@@ -75,11 +77,43 @@ def getTweets(request):
         "boat",
         "water"
     ]
-    bearer_credentials = str(base64.b64encode(bytes(s, 'UTF-8')))[2:-1]
-    bearer_response = requests.post('https://api.twitter.com/oauth2/token', )
+    auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
+    api = tweepy.API(auth)
+
     for query in queries:
         tweets = []
-        # poll Twitter here
+        results = api.search(query, 'en')
+        print(str(len(results)) + " results for " + query)
+        for result in results:
+            response_tweets.append(result.text)
+        #print(statuses[0]['text'])
+        #query_response = requests.get('https://api.twitter.com/1.1/search/tweets.json?q='+query+"&lang=en")
+        #print(query_response.json())
+        #for tweet in query_response.json()['statuses']:
+        #    tweets.append(tweet['text'])
+        #response_tweets.append(tweets)
+
+
+    headers = {
+        "Ocp-Apim-Subscription-Key": MS_COGNITAVE_SUBSCRIPTION,
+        "Content-Type": "application/json"
+    }
+    documents = []
+    i = 1
+    for document in response_tweets:
+        documents.append({
+            #"language": "en",
+            "id": str(i),
+            "text": document
+        })
+        i += 1
+    #print(documents)
+    req = requests.post("https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment", json={"documents" : documents}, headers=headers).json()
+    scoresum = 0.0
+    for response in req['documents']:
+        scoresum += response['score']
+    score = scoresum / len(req['documents'])
+    return HttpResponse(score)
 
 def getEmotions(request):
     tempInfo = {
