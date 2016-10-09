@@ -100,10 +100,11 @@ def getKeys(request):
         for track in recommendations['tracks']:
             songIDs += track['id'] + ','
         songIDs = songIDs[:-1];
+        playlist = '<iframe src="https://embed.spotify.com/?uri=spotify:trackset:PREFEREDTITLE:'+ songIDs + '" frameborder="0" allowtransparency="true"></iframe>'
         print(songIDs);
         #results = sp.current_user()
         #print(results);
-        return HttpResponse(recommendations);
+        return HttpResponse(playlist);
     return HttpResponse("<a href='" + sp_oauth.get_authorize_url() + "'>Login to Spotify</a>");
 
 def getTweets(request):
