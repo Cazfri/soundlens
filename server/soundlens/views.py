@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.shortcuts import render
 import json
 import requests
 import spotipy
@@ -24,6 +25,37 @@ import base64
 
 #d1075499bec940ad9d0d2aa09a6509bd - client_id
 #c8ae02f219604c0fa9e074ad1a7d5494 - secret
+indexHTML = '''
+<html>
+
+    <head>
+        <title>Hot Dawg</title>
+    </head>
+
+    <body>
+            <h1>soundlens</h1>
+
+            <label for="imgUrl">Enter Image URL:</label>
+            <!--<input type="text" id="imgUrl" name="imgUrl" />-->
+            <textarea id="imgUrl" rows="3" cols="50"></textarea>
+            <button type="button" onclick="previewImage()">preview image</button>
+
+            <img src="#" id="preview" alt="image preview..." height="250" width="300">
+            <br /> <br />
+            <a value="upload" id="link" href="#" >upload image</a>
+
+            <script>
+                function previewImage() {
+                    var url = document.getElementById("imgUrl").value;
+                    document.getElementsByTagName("img")[0].setAttribute("src", url);
+                    var s = "/sendImg?imgSrc=" + url;
+                    document.getElementsByTagName("a")[0].setAttribute("href", s);
+                }
+            </script>
+    </body>
+
+</html>
+'''
 
 SPOTIPY_CLIENT_ID = 'd1075499bec940ad9d0d2aa09a6509bd'
 SPOTIPY_CLIENT_SECRET = 'c8ae02f219604c0fa9e074ad1a7d5494'
@@ -41,7 +73,7 @@ def spotGetOAuth(request):
     return HttpResponse("HI");
 
 def home(request):
-    return HttpResponse("HI");
+    return HttpResponse(indexHTML);
 
 
 def getKeys(request):
@@ -66,9 +98,18 @@ def getKeys(request):
     if access_token:
         print("Access token available! Trying to get user information...")
         sp = spotipy.Spotify(access_token)
-        results = sp.current_user()
-        print(results);
-        return HttpResponse(results);
+        genres = sp.recommendation_genre_seeds()
+        recommendations = sp.recommendations(seed_artists=[], seed_genres=[genres['genres'][1]], seed_tracks=[], limit=20, country=None)
+        #print(recommendations['tracks']);
+        songIDs = "";
+        for track in recommendations['tracks']:
+            songIDs += track['id'] + ','
+        songIDs = songIDs[:-1];
+        playlist = '<iframe src="https://embed.spotify.com/?uri=spotify:trackset:PREFEREDTITLE:'+ songIDs + '" frameborder="0" allowtransparency="true"></iframe>'
+        print(songIDs);
+        #results = sp.current_user()
+        #print(results);
+        return HttpResponse(playlist);
     return HttpResponse("<a href='" + sp_oauth.get_authorize_url() + "'>Login to Spotify</a>");
 
 def getTweets(request):

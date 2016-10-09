@@ -1,0 +1,29 @@
+<html>
+
+    <head>
+        <title>Hot Dawg</title>
+    </head>
+
+    <body>
+            <h1>soundlens</h1>
+
+            <label for="imgUrl">Enter Image URL:</label>
+            <!--<input type="text" id="imgUrl" name="imgUrl" />-->
+            <textarea id="imgUrl" rows="3" cols="50"></textarea>
+            <button type="button" onclick="previewImage()">preview image</button>
+
+            <img src="#" id="preview" alt="image preview..." height="250" width="300">
+            <br /> <br />
+            <a value="upload" id="link" href="#" >upload image</a>
+
+            <script>
+                function previewImage() {
+                    var url = document.getElementById("imgUrl").value;
+                    document.getElementsByTagName("img")[0].setAttribute("src", url);
+                    var s = "/sendImg?imgSrc=" + url;
+                    document.getElementsByTagName("a")[0].setAttribute("href", s);
+                }
+            </script>
+    </body>
+
+</html>
