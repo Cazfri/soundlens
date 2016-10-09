@@ -93,9 +93,17 @@ def getKeys(request):
     if access_token:
         print("Access token available! Trying to get user information...")
         sp = spotipy.Spotify(access_token)
-        results = sp.current_user()
-        print(results);
-        return HttpResponse(results);
+        genres = sp.recommendation_genre_seeds()
+        recommendations = sp.recommendations(seed_artists=[], seed_genres=[genres['genres'][1]], seed_tracks=[], limit=20, country=None)
+        #print(recommendations['tracks']);
+        songIDs = "";
+        for track in recommendations['tracks']:
+            songIDs += track['id'] + ','
+        songIDs = songIDs[:-1];
+        print(songIDs);
+        #results = sp.current_user()
+        #print(results);
+        return HttpResponse(recommendations);
     return HttpResponse("<a href='" + sp_oauth.get_authorize_url() + "'>Login to Spotify</a>");
 
 def getTweets(request):
