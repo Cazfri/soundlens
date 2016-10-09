@@ -34,6 +34,9 @@ sp_oauth = spotipy.oauth2.SpotifyOAuth( SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET
 def spotGetOAuth(request):
     return HttpResponse("HI");
 
+def home(request):
+    return HttpResponse("HI");
+
 
 def getKeys(request):
     print(sp_oauth);

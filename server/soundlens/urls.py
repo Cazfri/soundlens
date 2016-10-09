@@ -19,8 +19,8 @@ from . import views
 
 urlpatterns = [
     #url(r'^admin/', admin.site.urls),
-    #url(r'^$', views.home, name='home'),
-    url(r'^home/sendImg/', views.submitImg, name='submitImg'),
+    url(r'^$', views.home, name='home'),
+    url(r'^sendImg/', views.submitImg, name='submitImg'),
     url(r'^spot1', views.spotGetOAuth, name='spotGetOAuth'),
     url(r'^spot2', views.getKeys, name='getKeys')
 ]
