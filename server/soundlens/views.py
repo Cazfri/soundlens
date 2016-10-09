@@ -152,8 +152,8 @@ def getTweets(queries):
     for response in req['documents']:
         scoresum += response['score']
     score = scoresum / len(req['documents'])
-    score -= .55; #.55 - .85
-    score = score * (1/.3) #0 - .3
+    score -= .6; #.6 - .75
+    score = score * (1/.15) #0 - .3
     if (score >= 1):
         score =.99
     elif score < 0:
@@ -213,5 +213,5 @@ def submitImg(request):
     output = [];
     for i in range(len(resp['results'][0]['result']['tag']['probs'])): #'classes'
         output.append(resp['results'][0]['result']['tag']['classes'][i])
-    score = getTweets(output);
+    score = getTweets(output[0:5]);
     return getKeys(request, score, output, imgSrc);
