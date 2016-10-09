@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.shortcuts import render
 import json
 import requests
 import spotipy
@@ -22,6 +23,34 @@ import spotipy.util as util
 
 #d1075499bec940ad9d0d2aa09a6509bd - client_id
 #c8ae02f219604c0fa9e074ad1a7d5494 - secret
+indexHTML = '''
+<html>
+
+    <head>
+        <title>Hot Dawg</title>
+    </head>
+
+    <body>
+            <h1>soundlens</h1>
+
+            <label for="imgUrl">Enter Image URL:</label>
+            <input type="text" id="imgUrl" name="imgUrl" />
+
+            <a value="upload" id="link" href="#" onclick="fixValues" \>
+
+            <script>
+                function fixValues() {
+                    var img = document.getElementById("imgUrl");
+                    var url = img.value();
+                    var s = "/sendImg?imgSrc=" + url;
+                    var link = document.getElementById("link");
+                    link.setAttribute("href", s);
+                }
+            </script>
+    </body>
+
+</html>
+'''
 
 SPOTIPY_CLIENT_ID = 'd1075499bec940ad9d0d2aa09a6509bd'
 SPOTIPY_CLIENT_SECRET = 'c8ae02f219604c0fa9e074ad1a7d5494'
@@ -39,7 +68,7 @@ def spotGetOAuth(request):
     return HttpResponse("HI");
 
 def home(request):
-    return HttpResponse("HI");
+    return HttpResponse(indexHTML);
 
 
 def getKeys(request):
