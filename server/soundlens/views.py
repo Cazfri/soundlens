@@ -34,11 +34,19 @@ indexHTML = '''
             <h1>soundlens</h1>
 
             <label for="imgUrl">Enter Image URL:</label>
-            <input type="text" id="imgUrl" name="imgUrl" />
+            <!--<input type="text" id="imgUrl" name="imgUrl" />-->
+            <textarea id="imgUrl" rows="3" cols="50"></textarea>
+            <button type="button" onclick="previewImage()">preview image</button>
 
-            <a value="upload" id="link" href="#" onclick="fixValues" \>
+            <img src="#" id="preview" alt="image preview..." height="250" width="300">
+
+            <a value="upload" id="link" href="#" onclick="fixValues">upload image</a>
 
             <script>
+                function previewImage() {
+                    var url = document.getElementById("imgUrl").value;
+                    document.getElementsByTagName("img")[0].setAttribute("src", url);
+                }
                 function fixValues() {
                     var img = document.getElementById("imgUrl");
                     var url = img.value();
@@ -46,6 +54,8 @@ indexHTML = '''
                     var link = document.getElementById("link");
                     link.setAttribute("href", s);
                 }
+
+                previewImage();
             </script>
     </body>
 
